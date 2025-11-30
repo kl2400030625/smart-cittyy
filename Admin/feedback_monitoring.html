@@ -1,29 +1,47 @@
 <div class="mt-4" id="feedback-monitoring">
     <h3>Feedback Monitoring</h3>
     <div class="table-responsive">
-        <table class="table table-bordered">
+        <table id="adminFeedbackTable" class="table table-bordered">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>User</th>
-                    <th>Rating</th>
                     <th>Comment</th>
+                    <th>Source</th>
                     <th>Date</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>Avinash</td>
-                    <td>⭐⭐⭐⭐⭐</td>
-                    <td>Great service, found the details I needed quickly.</td>
-                    <td>2025-09-24</td>
-                </tr>
-                <tr>
-                    <td>User123</td>
-                    <td>⭐⭐⭐</td>
-                    <td>Information was a bit outdated.</td>
-                    <td>2025-09-23</td>
-                </tr>
+            <tbody id="adminFeedbackTbody">
+                <!-- Populated from localStorage feedback keys -->
             </tbody>
         </table>
     </div>
+
+    <script>
+        (function(){
+            const tbody = document.getElementById('adminFeedbackTbody');
+            const keys = ['hospitalFeedbacks','parkFeedbacks','policeFeedbacks','transportFeedbacks'];
+            const adminKey = 'adminFeedbacks';
+
+            function loadKey(k){ try{ return JSON.parse(localStorage.getItem(k)||'[]'); }catch(e){return []} }
+            function loadAdmin(){ try{ return JSON.parse(localStorage.getItem(adminKey)||'[]'); }catch(e){return []} }
+            function saveAdmin(items){ localStorage.setItem(adminKey, JSON.stringify(items)); }
+
+            function collect(){ const out = []; keys.forEach(k=>{ const arr = loadKey(k); if(Array.isArray(arr)) arr.forEach(it=> out.push(Object.assign({source:k}, it))); }); return out; }
+
+            function render(){ const items = collect(); const admin = loadAdmin(); const combined = items.concat(admin); tbody.innerHTML=''; if(!combined.length){ tbody.innerHTML = '<tr><td colspan="6" class="text-muted">No feedback submissions.</td></tr>'; return; } combined.slice().reverse().forEach((it, idx)=>{ const tr=document.createElement('tr'); const user = it.user? (it.user.name||it.user.email) : 'Anonymous'; const date = it.ts? new Date(it.ts).toLocaleString():''; tr.innerHTML = '<td>'+(idx+1)+'</td><td>'+escapeHtml(user)+'</td><td><pre style="white-space:pre-wrap;margin:0;">'+escapeHtml(it.text||it.comment||'')+'</pre></td><td>'+escapeHtml(it.source||'')+'</td><td>'+escapeHtml(date)+'</td><td><button class="btn btn-sm btn-danger" data-action="delete" data-idx="'+idx+'">Delete</button></td>'; tbody.appendChild(tr); }); }
+
+            function escapeHtml(s){ if(s===null||s===undefined) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+            tbody.addEventListener('click', function(e){ const btn = e.target.closest('button'); if(!btn) return; const act = btn.getAttribute('data-action'); const idx = Number(btn.getAttribute('data-idx')); if(act==='delete'){ // delete from admin-managed backups if present
+                    const admin = loadAdmin(); if(idx < 0) return; // map index to reversed combined list
+                    // simple approach: remove the corresponding admin item if exists
+                    if(admin.length){ admin.splice(admin.length-1-idx,1); saveAdmin(admin); }
+                    render(); }
+            });
+
+            render();
+        })();
+    </script>
 </div>

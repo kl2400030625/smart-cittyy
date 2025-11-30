@@ -280,5 +280,92 @@
         })();
     });
 </script>
+<script>
+    // Admin CRUD glue: service updates, cities, complaints, feedback aggregation
+    (function(){
+        function escapeHtml(str){ if(str===null||str===undefined) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+        // ----- Service Updates -----
+        (function(){
+            const section = document.getElementById('service-updates');
+            if(!section) return;
+            const form = section.querySelector('form');
+            const titleIn = section.querySelector('#updateTitle');
+            const contentIn = section.querySelector('#updateContent');
+            const listEl = section.querySelector('ul.list-group');
+            const key = 'serviceUpdates';
+
+            function load(){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){return []} }
+            function save(items){ localStorage.setItem(key, JSON.stringify(items)); }
+            function render(){ const items = load(); listEl.innerHTML = ''; items.slice().reverse().forEach(it=>{ const li = document.createElement('li'); li.className='list-group-item d-flex justify-content-between align-items-start'; const left = document.createElement('div'); left.innerHTML = '<div><strong>'+escapeHtml(it.title)+'</strong></div><div class="small text-muted">'+escapeHtml(it.content)+'</div>'; const right = document.createElement('div'); right.innerHTML = '<small class="text-muted me-2">'+(new Date(it.ts).toLocaleDateString())+'</small><button class="btn btn-sm btn-outline-primary me-2" data-id="'+it.id+'" data-action="edit">Edit</button><button class="btn btn-sm btn-outline-danger" data-id="'+it.id+'" data-action="delete">Delete</button>'; li.appendChild(left); li.appendChild(right); listEl.appendChild(li); }); }
+
+            form.addEventListener('submit', function(e){ e.preventDefault(); const t = titleIn.value.trim(); const c = contentIn.value.trim(); if(!t||!c) return; const items = load(); items.push({ id:String(Date.now()), title:t, content:c, ts: Date.now() }); save(items); form.reset(); render(); });
+
+            listEl.addEventListener('click', function(e){ const btn = e.target.closest('button'); if(!btn) return; const id = btn.getAttribute('data-id'); const action = btn.getAttribute('data-action'); const items = load(); if(action==='delete'){ save(items.filter(x=>x.id!==id)); render(); return; } if(action==='edit'){ const it = items.find(x=>x.id===id); if(!it) return; titleIn.value = it.title; contentIn.value = it.content; save(items.filter(x=>x.id!==id)); render(); window.scrollTo({top: form.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); } });
+
+            render();
+        })();
+
+        // ----- Manage Cities -----
+        (function(){
+            const section = document.getElementById('manage-cities');
+            if(!section) return;
+            const form = section.querySelector('form');
+            const nameIn = section.querySelector('#cityName');
+            const detailsIn = section.querySelector('#cityDetails');
+            const tbody = section.querySelector('table tbody');
+            const key = 'cities';
+            function load(){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){return []} }
+            function save(items){ localStorage.setItem(key, JSON.stringify(items)); }
+            function render(){ const items = load(); tbody.innerHTML=''; items.forEach(it=>{ const tr=document.createElement('tr'); tr.innerHTML = '<td>'+escapeHtml(it.name)+'</td><td>'+escapeHtml(it.details)+'</td><td><button class="btn btn-sm btn-warning" data-id="'+it.id+'" data-action="edit">Edit</button> <button class="btn btn-sm btn-danger" data-id="'+it.id+'" data-action="delete">Delete</button></td>'; tbody.appendChild(tr); }); }
+            form.addEventListener('submit', function(e){ e.preventDefault(); const name = nameIn.value.trim(); const details = detailsIn.value.trim(); if(!name) return; const items = load(); items.push({ id:String(Date.now()), name, details }); save(items); form.reset(); render(); });
+            tbody.addEventListener('click', function(e){ const btn = e.target.closest('button'); if(!btn) return; const id = btn.getAttribute('data-id'); const action = btn.getAttribute('data-action'); const items = load(); if(action==='delete'){ save(items.filter(x=>x.id!==id)); render(); return; } if(action==='edit'){ const it = items.find(x=>x.id===id); if(!it) return; nameIn.value = it.name; detailsIn.value = it.details; save(items.filter(x=>x.id!==id)); } });
+            render();
+        })();
+
+        // ----- Complaints (aggregate user reports) -----
+        (function(){
+            const section = document.getElementById('manage-complaints');
+            if(!section) return;
+            const tbody = section.querySelector('table tbody');
+            const reportKeys = ['hospitalReports','parkReports','policeReports','transportReports','complaints'];
+            const adminKey = 'adminComplaints';
+
+            function loadAdmin(){ try{ return JSON.parse(localStorage.getItem(adminKey)||'[]'); }catch(e){return []} }
+            function saveAdmin(items){ localStorage.setItem(adminKey, JSON.stringify(items)); }
+            function loadAllReports(){
+                let out = [];
+                reportKeys.forEach(k=>{ try{ const arr = JSON.parse(localStorage.getItem(k)||'[]'); if(Array.isArray(arr)) arr.forEach(x=>{ out.push(Object.assign({source:k}, x)); }); }catch(e){} });
+                return out;
+            }
+
+            // sync new reports into admin list
+            function sync(){ const admin = loadAdmin(); const reports = loadAllReports(); const ids = new Set(admin.map(a=>a.origId||a.id)); reports.forEach(r=>{ const origId = r.id || (r.origId); if(!ids.has(origId)){ admin.push({ id: String(Date.now())+Math.floor(Math.random()*1000), origId: origId, source: r.source||'', text: r.text||r.description||r.issue||'', user: r.user||null, ts: r.ts||Date.now(), status:'Pending' }); ids.add(origId); } }); saveAdmin(admin); return admin; }
+
+            function render(){ const items = loadAdmin(); tbody.innerHTML=''; items.forEach(it=>{ const tr = document.createElement('tr'); tr.innerHTML = '<td>'+escapeHtml(it.id)+'</td><td>'+(it.user?escapeHtml(it.user.name||it.user.email||'User'):'Anonymous')+'</td><td><pre style="white-space:pre-wrap;margin:0;">'+escapeHtml(it.text)+'</pre></td><td>'+(it.status==='Resolved'?'<span class="badge bg-success">Resolved</span>':'<span class="badge bg-warning text-dark">Pending</span>')+'</td><td><button class="btn btn-sm btn-info" data-id="'+it.id+'" data-action="view">View Details</button> <button class="btn btn-sm btn-success" data-id="'+it.id+'" data-action="toggle">Mark Resolved</button> <button class="btn btn-sm btn-danger" data-id="'+it.id+'" data-action="delete">Delete</button></td>'; tbody.appendChild(tr); }); }
+
+            tbody.addEventListener('click', function(e){ const btn = e.target.closest('button'); if(!btn) return; const id = btn.getAttribute('data-id'); const action = btn.getAttribute('data-action'); const items = loadAdmin(); const idx = items.findIndex(x=>x.id===id); if(idx<0) return; if(action==='delete'){ items.splice(idx,1); saveAdmin(items); render(); return; } if(action==='toggle'){ items[idx].status = items[idx].status==='Resolved'?'Pending':'Resolved'; saveAdmin(items); render(); return; } if(action==='view'){ alert('Report details:\n\n'+items[idx].text); return; } });
+
+            // initial sync + render
+            sync(); render();
+        })();
+
+        // ----- Feedback Monitoring -----
+        (function(){
+            const table = document.getElementById('submissionsTable');
+            const tbody = table?table.querySelector('tbody'):null;
+            const noMsg = document.getElementById('noSubmissionsMsg');
+            const feedbackKeys = [ 'hospitalFeedbacks','parkFeedbacks','policeFeedbacks','transportFeedbacks' ];
+            if(!tbody) return;
+
+            function loadAll(){ let out = []; feedbackKeys.forEach(k=>{ try{ const arr = JSON.parse(localStorage.getItem(k)||'[]'); if(Array.isArray(arr)) arr.forEach(it=>{ out.push(Object.assign({source:k}, it)); }); }catch(e){} }); return out; }
+
+            function render(){ const items = loadAll(); tbody.innerHTML=''; if(!items.length){ if(noMsg) noMsg.style.display='block'; return; } if(noMsg) noMsg.style.display='none'; items.slice().reverse().forEach((s, idx)=>{ const tr = document.createElement('tr'); const date = s.ts?new Date(s.ts).toLocaleString():''; const type='Feedback'; const title = s.service || (s.source||'').replace('Feedbacks',''); const details = s.text || s.comment || s.review || ''; tr.innerHTML = '<td>'+(idx+1)+'</td>'+'<td>'+escapeHtml(type)+'</td>'+'<td>'+escapeHtml(title)+'</td>'+'<td><pre style="white-space:pre-wrap;margin:0;">'+escapeHtml(details)+'</pre></td>'+'<td>'+escapeHtml(date)+'</td>'; tbody.appendChild(tr); }); }
+
+            render();
+        })();
+
+    })();
+</script>
 </body>
 </html>

@@ -2,7 +2,7 @@
     <h3>Service Updates</h3>
     <div class="card p-3 mb-4">
         <h4>Create New Update</h4>
-        <form>
+        <form id="adminServiceUpdateForm">
             <div class="mb-3">
                 <label for="updateTitle" class="form-label">Title</label>
                 <input type="text" class="form-control" id="updateTitle" required>
@@ -16,14 +16,27 @@
     </div>
 
     <h4>Published Updates</h4>
-    <ul class="list-group">
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            Server maintenance scheduled for tonight.
-            <span class="badge bg-secondary">2025-09-24</span>
-        </li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            New features added to the dashboard.
-            <span class="badge bg-secondary">2025-09-21</span>
-        </li>
-    </ul>
+    <ul id="adminServiceUpdatesList" class="list-group"></ul>
+
+    <script>
+        (function(){
+            const key = 'serviceUpdates';
+            const form = document.getElementById('adminServiceUpdateForm');
+            const titleIn = document.getElementById('updateTitle');
+            const contentIn = document.getElementById('updateContent');
+            const listEl = document.getElementById('adminServiceUpdatesList');
+
+            function load(){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){return []} }
+            function save(items){ localStorage.setItem(key, JSON.stringify(items)); }
+            function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c]); }
+
+            function render(){ const items = load(); listEl.innerHTML=''; items.slice().reverse().forEach(it=>{ const li=document.createElement('li'); li.className='list-group-item d-flex justify-content-between align-items-start'; li.innerHTML = '<div><strong>'+escapeHtml(it.title)+'</strong><div class="small text-muted">'+escapeHtml(it.content)+'</div></div>'; const right=document.createElement('div'); right.innerHTML = '<small class="text-muted me-2">'+(new Date(it.ts).toLocaleDateString())+'</small><button class="btn btn-sm btn-outline-primary me-2" data-id="'+it.id+'" data-action="edit">Edit</button><button class="btn btn-sm btn-outline-danger" data-id="'+it.id+'" data-action="delete">Delete</button>'; li.appendChild(right); listEl.appendChild(li); }); }
+
+            form.addEventListener('submit', function(e){ e.preventDefault(); const t = titleIn.value.trim(); const c = contentIn.value.trim(); if(!t||!c) return; const items = load(); items.push({ id:String(Date.now()), title:t, content:c, ts: Date.now() }); save(items); form.reset(); render(); });
+
+            listEl.addEventListener('click', function(e){ const btn = e.target.closest('button'); if(!btn) return; const id = btn.getAttribute('data-id'); const action = btn.getAttribute('data-action'); const items = load(); if(action==='delete'){ save(items.filter(x=>x.id!==id)); render(); return; } if(action==='edit'){ const it = items.find(x=>x.id===id); if(!it) return; titleIn.value = it.title; contentIn.value = it.content; save(items.filter(x=>x.id!==id)); render(); } });
+
+            render();
+        })();
+    </script>
 </div>

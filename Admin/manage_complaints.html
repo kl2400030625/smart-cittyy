@@ -11,27 +11,32 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>C001</td>
-                    <td>Avinash</td>
-                    <td>Street light broken in Sector 4.</td>
-                    <td><span class="badge bg-warning text-dark">Pending</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-info">View Details</button>
-                        <button class="btn btn-sm btn-success">Mark as Resolved</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>C002</td>
-                    <td>Jayalakshmi</td>
-                    <td>Pothole on Main Road near Vijaya Vidya Vihar.</td>
-                    <td><span class="badge bg-success">Resolved</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-info">View Details</button>
-                    </td>
-                </tr>
+            <tbody id="adminComplaintsTbody">
+                <!-- Filled dynamically from localStorage (adminComplaints) -->
             </tbody>
         </table>
     </div>
+
+    <script>
+        (function(){
+            const tbody = document.getElementById('adminComplaintsTbody');
+            const adminKey = 'adminComplaints';
+            const reportKeys = ['hospitalReports','parkReports','policeReports','transportReports','complaints'];
+
+            function loadAdmin(){ try{ return JSON.parse(localStorage.getItem(adminKey)||'[]'); }catch(e){return []} }
+            function saveAdmin(items){ localStorage.setItem(adminKey, JSON.stringify(items)); }
+            function loadAllReports(){ let out=[]; reportKeys.forEach(k=>{ try{ const arr = JSON.parse(localStorage.getItem(k)||'[]'); if(Array.isArray(arr)) arr.forEach(x=>{ out.push(Object.assign({source:k}, x)); }); }catch(e){} }); return out; }
+
+            function sync(){ const admin = loadAdmin(); const reports = loadAllReports(); const ids = new Set(admin.map(a=>a.origId||a.id)); reports.forEach(r=>{ const origId = r.id || r.origId; if(!ids.has(origId)){ admin.push({ id: String(Date.now())+Math.floor(Math.random()*1000), origId: origId, source: r.source||'', text: r.text||r.description||r.issue||'', user: r.user||null, ts: r.ts||Date.now(), status:'Pending' }); ids.add(origId); } }); saveAdmin(admin); return admin; }
+
+            function render(){ const items = loadAdmin(); tbody.innerHTML=''; items.forEach(it=>{ const tr=document.createElement('tr'); tr.innerHTML = '<td>'+escapeHtml(it.id)+'</td><td>'+(it.user?escapeHtml(it.user.name||it.user.email||'User'):'Anonymous')+'</td><td><pre style="white-space:pre-wrap;margin:0;">'+escapeHtml(it.text)+'</pre></td><td>'+(it.status==='Resolved'?'<span class="badge bg-success">Resolved</span>':'<span class="badge bg-warning text-dark">Pending</span>')+'</td><td><button class="btn btn-sm btn-info" data-id="'+it.id+'" data-action="view">View Details</button> <button class="btn btn-sm btn-success" data-id="'+it.id+'" data-action="toggle">Mark Resolved</button> <button class="btn btn-sm btn-danger" data-id="'+it.id+'" data-action="delete">Delete</button></td>'; tbody.appendChild(tr); }); }
+
+            function escapeHtml(s){ if(s===null||s===undefined) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+            tbody.addEventListener('click', function(e){ const btn = e.target.closest('button'); if(!btn) return; const id = btn.getAttribute('data-id'); const action = btn.getAttribute('data-action'); const items = loadAdmin(); const idx = items.findIndex(x=>x.id===id); if(idx<0) return; if(action==='delete'){ items.splice(idx,1); saveAdmin(items); render(); return; } if(action==='toggle'){ items[idx].status = items[idx].status==='Resolved'?'Pending':'Resolved'; saveAdmin(items); render(); return; } if(action==='view'){ alert('Complaint details:\n\n'+items[idx].text); return; } });
+
+            // initial sync and render
+            sync(); render();
+        })();
+    </script>
 </div>

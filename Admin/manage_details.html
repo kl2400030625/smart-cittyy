@@ -25,24 +25,31 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>New Delhi</td>
-                    <td>Capital of India...</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning">Edit</button>
-                        <button class="btn btn-sm btn-danger">Delete</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Mumbai</td>
-                    <td>Financial capital...</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning">Edit</button>
-                        <button class="btn btn-sm btn-danger">Delete</button>
-                    </td>
-                </tr>
+            <tbody id="adminCitiesTbody">
+                <!-- Filled dynamically -->
             </tbody>
         </table>
     </div>
+
+    <script>
+        (function(){
+            const form = document.querySelector('#manage-cities form');
+            const nameIn = document.getElementById('cityName');
+            const detailsIn = document.getElementById('cityDetails');
+            const tbody = document.getElementById('adminCitiesTbody');
+            const key = 'cities';
+
+            function load(){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){return []} }
+            function save(items){ localStorage.setItem(key, JSON.stringify(items)); }
+            function escapeHtml(s){ if(s===null||s===undefined) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+            function render(){ const items = load(); tbody.innerHTML=''; items.forEach(it=>{ const tr=document.createElement('tr'); tr.innerHTML = '<td>'+escapeHtml(it.name)+'</td><td>'+escapeHtml(it.details)+'</td><td><button class="btn btn-sm btn-warning" data-id="'+it.id+'" data-action="edit">Edit</button> <button class="btn btn-sm btn-danger" data-id="'+it.id+'" data-action="delete">Delete</button></td>'; tbody.appendChild(tr); }); }
+
+            form.addEventListener('submit', function(e){ e.preventDefault(); const name = nameIn.value.trim(); const details = detailsIn.value.trim(); if(!name) return; const items = load(); items.push({ id: String(Date.now()), name, details }); save(items); form.reset(); render(); });
+
+            tbody.addEventListener('click', function(e){ const btn = e.target.closest('button'); if(!btn) return; const id = btn.getAttribute('data-id'); const action = btn.getAttribute('data-action'); const items = load(); const idx = items.findIndex(x=>x.id===id); if(idx<0) return; if(action==='delete'){ items.splice(idx,1); save(items); render(); return; } if(action==='edit'){ const it = items[idx]; nameIn.value = it.name; detailsIn.value = it.details; items.splice(idx,1); save(items); } });
+
+            render();
+        })();
+    </script>
 </div>
