@@ -1,0 +1,48 @@
+<div class="mt-4" id="manage-cities">
+    <h3>Manage City Details</h3>
+    <div class="card p-3 mb-4">
+        <h4>Add New City</h4>
+        <form>
+            <div class="mb-3">
+                <label for="cityName" class="form-label">City Name</label>
+                <input type="text" class="form-control" id="cityName" required>
+            </div>
+            <div class="mb-3">
+                <label for="cityDetails" class="form-label">City Details</label>
+                <textarea class="form-control" id="cityDetails" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-success">Add City</button>
+        </form>
+    </div>
+    
+    <h4>Existing Cities</h4>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>City Name</th>
+                    <th>Details</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>New Delhi</td>
+                    <td>Capital of India...</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning">Edit</button>
+                        <button class="btn btn-sm btn-danger">Delete</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Mumbai</td>
+                    <td>Financial capital...</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning">Edit</button>
+                        <button class="btn btn-sm btn-danger">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

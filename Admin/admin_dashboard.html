@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/admin.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; }
+        .sidebar { height: 100vh; background-color: #343a40; color: white; padding-top: 1rem; }
+        .sidebar a { color: #adb5bd; text-decoration: none; padding: 10px 15px; display: block; }
+        .sidebar a:hover { background-color: #495057; color: white; }
+        .content { padding: 2rem; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Admin Panel</a>
+            <div class="ms-auto d-flex align-items-center">
+            <span class="navbar-text me-3 d-none d-md-block">Welcome, Admin</span>
+            <button id="logoutBtn" class="btn btn-outline-light" type="button">Logout</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-target="dashboard-overview">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-target="manage-cities">
+                            Manage City Details
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-target="manage-complaints">
+                            View & Manage Complaints
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-target="feedback-monitoring">
+                            Feedback Monitoring
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-target="service-updates">
+                            Service Updates
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 content">
+            
+            <div id="dashboard-overview" class="content-section active">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Dashboard</h1>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card text-white bg-primary mb-3">
+                            <div class="card-header">Total Users</div>
+                            <div class="card-body">
+                                <h5 class="card-title">1,250</h5>
+                                <p class="card-text">Total registered users.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card text-white bg-success mb-3">
+                            <div class="card-header">Open Complaints</div>
+                            <div class="card-body">
+                                <h5 class="card-title">45</h5>
+                                <p class="card-text">Complaints pending action.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card text-white bg-warning mb-3">
+                            <div class="card-header">New Feedback</div>
+                            <div class="card-body">
+                                <h5 class="card-title">12</h5>
+                                <p class="card-text">New feedback submissions.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h3 class="mt-4">Recent Activity</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Activity</th>
+                                <th>User</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>Complaint reported</td><td>Avinash</td><td>2025-09-24</td></tr>
+                            <tr><td>2</td><td>New city added</td><td>Admin User</td><td>2025-09-23</td></tr>
+                            <tr><td>3</td><td>Feedback submitted</td><td>Jayalakshmi</td><td>2025-09-22</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="manage-cities" class="content-section">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Manage City Details</h1>
+                </div>
+                <div class="card p-3 mb-4">
+                    <h4>Add New City</h4>
+                    <form><div class="mb-3"><label for="cityName" class="form-label">City Name</label><input type="text" class="form-control" id="cityName" required></div><div class="mb-3"><label for="cityDetails" class="form-label">City Details</label><textarea class="form-control" id="cityDetails" rows="3" required></textarea></div><button type="submit" class="btn btn-success">Add City</button></form>
+                </div>
+                <h4>Existing Cities</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead><tr><th>City Name</th><th>Details</th><th>Actions</th></tr></thead>
+                        <tbody><tr><td>New Delhi</td><td>Capital of India...</td><td><button class="btn btn-sm btn-warning">Edit</button><button class="btn btn-sm btn-danger">Delete</button></td></tr><tr><td>Mumbai</td><td>Financial capital...</td><td><button class="btn btn-sm btn-warning">Edit</button><button class="btn btn-sm btn-danger">Delete</button></td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="manage-complaints" class="content-section">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">View & Manage Complaints</h1>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead><tr><th>Complaint ID</th><th>User</th><th>Issue</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody><tr><td>C001</td><td>Avinash</td><td>Street light broken in Sector 4.</td><td><span class="badge bg-warning text-dark">Pending</span></td><td><button class="btn btn-sm btn-info">View Details</button><button class="btn btn-sm btn-success">Mark as Resolved</button></td></tr><tr><td>C002</td><td>Jayalakshmi</td><td>Pothole on Main Road near Vijaya Vidya Vihar.</td><td><span class="badge bg-success">Resolved</span></td><td><button class="btn btn-sm btn-info">View Details</button></td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="feedback-monitoring" class="content-section">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Feedback Monitoring</h1>
+                </div>
+                <div class="table-responsive">
+                    <table id="submissionsTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Type</th>
+                                <th>Title / Service</th>
+                                <th>Details</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                    <p id="noSubmissionsMsg" class="text-muted">No submissions found.</p>
+                </div>
+            </div>
+
+            <div id="service-updates" class="content-section">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Service Updates</h1>
+                </div>
+                <div class="card p-3 mb-4">
+                    <h4>Create New Update</h4>
+                    <form><div class="mb-3"><label for="updateTitle" class="form-label">Title</label><input type="text" class="form-control" id="updateTitle" required></div><div class="mb-3"><label for="updateContent" class="form-label">Content</label><textarea class="form-control" id="updateContent" rows="3" required></textarea></div><button type="submit" class="btn btn-primary">Publish Update</button></form>
+                </div>
+                <h4>Published Updates</h4>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">Server maintenance scheduled for tonight.<span class="badge bg-secondary">2025-09-24</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">New features added to the dashboard.<span class="badge bg-secondary">2025-09-21</span></li>
+                </ul>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                // Remove 'active' class from all links and sections
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                contentSections.forEach(section => section.classList.remove('active'));
+
+                // Add 'active' class to the clicked link
+                this.classList.add('active');
+
+                // Get the target section ID from the data-target attribute
+                const targetId = this.getAttribute('data-target');
+                const targetSection = document.getElementById(targetId);
+
+                // Add 'active' class to the corresponding section
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+            });
+        });
+
+        // Logout button: redirect to the main dashboard page
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                try {
+                    // clear any session/local storage if used for auth
+                    if (window.sessionStorage) sessionStorage.clear();
+                    if (window.localStorage) localStorage.removeItem('adminLoggedIn');
+                } catch (e) {
+                    // ignore storage errors
+                }
+                // Redirect to main dashboard (one level up)
+                window.location.href = '../dashboard.html';
+            });
+        }
+
+        // Populate submissions (Reports & Reviews) for admin from localStorage
+        (function populateSubmissions(){
+            try{
+                const tbl = document.getElementById('submissionsTable');
+                const tbody = tbl ? tbl.querySelector('tbody') : null;
+                const noMsg = document.getElementById('noSubmissionsMsg');
+                if(!tbody){ if(noMsg) noMsg.style.display = 'block'; return; }
+
+                const submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
+                if(!submissions || submissions.length===0){ if(noMsg) noMsg.style.display = 'block'; return; }
+                noMsg.style.display = 'none';
+
+                submissions.forEach((s, idx) => {
+                    const tr = document.createElement('tr');
+                    const date = s.ts ? new Date(s.ts).toLocaleString() : '';
+                    const type = s.type || '';
+                    let title = '';
+                    let details = '';
+                    if(type.toLowerCase()==='report'){
+                        title = s.title || s.location || '';
+                        details = (s.description || '') + (s.location?(' (Location: '+s.location+')'):'');
+                    } else if(type.toLowerCase()==='review'){
+                        title = s.service || '';
+                        details = 'Rating: '+(s.rating||'') + '\n' + (s.comment||'');
+                    } else {
+                        title = s.title || s.service || '';
+                        details = JSON.stringify(s);
+                    }
+
+                    tr.innerHTML = '<td>'+(idx+1)+'</td>'+
+                                   '<td>'+escapeHtml(type)+'</td>'+
+                                   '<td>'+escapeHtml(title)+'</td>'+
+                                   '<td><pre style="white-space:pre-wrap;margin:0;">'+escapeHtml(details)+'</pre></td>'+
+                                   '<td>'+escapeHtml(date)+'</td>';
+                    tbody.appendChild(tr);
+                });
+            }catch(e){
+                // ignore if storage not accessible
+            }
+
+            function escapeHtml(str){
+                if(!str && str!==0) return '';
+                return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            }
+        })();
+    });
+</script>
+</body>
+</html>

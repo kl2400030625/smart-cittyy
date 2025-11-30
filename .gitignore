@@ -1,0 +1,46 @@
+.DS_Store
+Thumbs.db
+node_modules/
+.vscode/
+.idea/
+*.log
+*.tmp
+*.env
+__pycache__/
+*.pyc
+*.pyo
+*.class
+*.exe
+*.dll
+*.so
+*.dmg
+*.msi
+*.db
+*.sqlite
+*.bak
+*.swp
+*.swo
+*.~*
+*.pem
+*.key
+*.crt
+# OneDrive & system
+~$*
+*.lnk
+
+# Ignore Python virtual envs
+venv/
+ENV/
+env/
+
+# Ignore npm package lock if you manage dependencies differently
+# package-lock.json
+
+# Ignore build artifacts
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

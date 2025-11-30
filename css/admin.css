@@ -1,0 +1,36 @@
+:root {
+  --admin-bg: #0f1724; /* deep navy */
+  --admin-sidebar: #0b1220; /* darker */
+  --admin-accent: #00bcd4; /* cyan */
+  --admin-card: #111827; /* card background */
+  --admin-text: #e6eef6; /* light text */
+  --muted: #9aa7b2;
+}
+
+/* Base */
+html,body{height:100%;background:var(--admin-bg);color:var(--admin-text);font-family:Segoe UI, Roboto, Arial, sans-serif}
+
+.navbar{background:linear-gradient(90deg,var(--admin-sidebar),rgba(10,15,25,0.85))!important}
+
+.sidebar{background:var(--admin-sidebar)!important;color:var(--muted)}
+.sidebar a{color:var(--muted)}
+.sidebar a.active, .sidebar a:hover{background:rgba(255,255,255,0.04);color:var(--admin-text)}
+
+.content{background:transparent;color:var(--admin-text)}
+.card{background:var(--admin-card);border:0;color:var(--admin-text)}
+.card .card-header{background:transparent;border-bottom:1px solid rgba(255,255,255,0.04)}
+
+.table thead th{color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.06)}
+.table tbody td{vertical-align:middle}
+
+.btn-primary{background:var(--admin-accent);border-color:transparent}
+.btn-outline-light{color:var(--admin-text);border-color:rgba(255,255,255,0.08)}
+
+/* Submissions table */
+#submissionsTable pre{color:var(--admin-text);font-family:inherit}
+#noSubmissionsMsg{color:var(--muted);padding:1rem}
+
+/* Responsive tweaks */
+@media (max-width:768px){
+  .sidebar{display:none}
+}

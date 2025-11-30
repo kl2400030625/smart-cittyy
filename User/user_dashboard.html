@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart City Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/user.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            height: 100vh;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .card-service {
+            transition: transform 0.2s;
+            cursor: pointer;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .card-service:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-service .emoji {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        .search-bar {
+            border-radius: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 sidebar d-none d-md-block">
+            <h4>USER DASHBOARD:</h4>
+        </div>
+
+        <div class="col-12 col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Welcome to Smart City</h2>
+                <div class="d-flex align-items-center">
+                    <button id="profileIconBtn" class="btn btn-outline-secondary p-0 me-2" style="width:44px;height:44px;border-radius:50%;overflow:hidden;">
+                        <div id="profileAvatar" style="width:100%;height:100%;border-radius:50%;background:#0d6efd;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;">U</div>
+                    </button>
+                    <button id="userLogoutBtn" class="btn btn-sm btn-outline-danger">Logout</button>
+                </div>
+            </div>
+            <!-- Inline edit form (hidden) -->
+            <div id="profileFormCard" class="card mb-3" style="display:none; max-width:480px;">
+                <div class="card-body">
+                    <form id="profileForm">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <input id="inputName" class="form-control" placeholder="Full name" required />
+                            </div>
+                            <div class="col-md-4">
+                                <input id="inputEmail" type="email" class="form-control" placeholder="Email" required />
+                            </div>
+                            <div class="col-md-3">
+                                <input id="inputPhone" class="form-control" placeholder="Phone (optional)" />
+                            </div>
+                            <div class="col-md-1 d-grid">
+                                <button class="btn btn-success" type="submit">Save</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- search removed per request -->
+
+            <div class="row justify-content-center g-4">
+                <div class="col-6 col-sm-6 col-md-3">
+                    <a href="hospital.html" class="card card-service text-decoration-none text-dark">Enter</a>
+                    <div class="card card-service">
+                        <div class="card-body">
+                            <span class="emoji">🏥</span>
+                            <h5 class="card-title">Hospital</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-6 col-md-3">
+                    <a href="park.html" class="card card-service text-decoration-none text-dark">Enter</a>
+                    <div class="card card-service">
+                        <div class="card-body">
+                            <span class="emoji">🌳</span>
+                            <h5 class="card-title">Park</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-6 col-md-3">
+                    <a href="transport.html" class="card card-service text-decoration-none text-dark">Enter</a>
+                    <div class="card card-service">
+                        <div class="card-body">
+                            <span class="emoji">🚌</span>
+                            <h5 class="card-title">Transport</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-6 col-md-3">
+                    <a href="police.html" class="card card-service text-decoration-none text-dark">Enter</a>
+                    <div class="card card-service">
+                        <div class="card-body">
+                            <span class="emoji">🚓</span>
+                            <h5 class="card-title">Police</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Report / Review Links -->
+            <div class="row justify-content-center mt-4">
+                <div class="col-6 col-sm-6 col-md-3">
+                    <a href="report.html" class="card card-service text-decoration-none text-dark">
+                        <div class="card-body">
+                            <span class="emoji">⚠️</span>
+                            <h5 class="card-title">Submit Report</h5>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-6 col-sm-6 col-md-3">
+                    <a href="review.html" class="card card-service text-decoration-none text-dark">
+                        <div class="card-body">
+                            <span class="emoji">⭐</span>
+                            <h5 class="card-title">Submit Review</h5>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Profile load/save logic (small icon + inline form)
+(function(){
+    const profileKey = 'userProfile';
+    const avatarEl = document.getElementById('profileAvatar');
+    const iconBtn = document.getElementById('profileIconBtn');
+    const formCard = document.getElementById('profileFormCard');
+    const profileForm = document.getElementById('profileForm');
+    const inputName = document.getElementById('inputName');
+    const inputEmail = document.getElementById('inputEmail');
+    const inputPhone = document.getElementById('inputPhone');
+    const logoutBtn = document.getElementById('userLogoutBtn');
+
+    function loadProfile(){
+        try{
+            const p = JSON.parse(localStorage.getItem(profileKey) || 'null');
+            if(p){
+                avatarEl.textContent = (p.name && p.name.length>0) ? p.name.trim().charAt(0).toUpperCase() : 'U';
+                inputName.value = p.name || '';
+                inputEmail.value = p.email || '';
+                inputPhone.value = p.phone || '';
+            } else {
+                avatarEl.textContent = 'U';
+                inputName.value = '';
+                inputEmail.value = '';
+                inputPhone.value = '';
+            }
+        }catch(e){
+            avatarEl.textContent = 'U';
+        }
+    }
+
+    iconBtn.addEventListener('click', function(){
+        formCard.style.display = formCard.style.display === 'none' ? 'block' : 'none';
+        if(formCard.style.display === 'block') setTimeout(()=> inputName.focus(), 50);
+    });
+
+    // Logout: clear session and redirect to main dashboard
+    if(logoutBtn){
+        logoutBtn.addEventListener('click', function(){
+            try{
+                localStorage.removeItem('userLoggedIn');
+                localStorage.removeItem('currentUser');
+            }catch(e){}
+            window.location.href = '../dashboard.html';
+        });
+    }
+
+    profileForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        const profile = { name: inputName.value.trim(), email: inputEmail.value.trim(), phone: inputPhone.value.trim() };
+        try{ localStorage.setItem(profileKey, JSON.stringify(profile)); }catch(err){ /* ignore */ }
+        loadProfile();
+        formCard.style.display = 'none';
+    });
+
+    // initialize
+    loadProfile();
+})();
+</script>
+
+</body>
+</html>
