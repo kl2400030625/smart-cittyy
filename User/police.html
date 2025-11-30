@@ -28,12 +28,31 @@
                             <p><strong>Emergency: <span class="text-danger">911</span></strong> (For immediate threats to life or property)</p>
                             <p><strong>Non-Emergency Line:</strong> (555) 123-4567</p>
                         </div>
-                        <ul class="list-group">
-                            <li class="list-group-item">Central Police Station <span class="badge bg-primary">Open 24/7</span></li>
-                            <li class="list-group-item">District 2 Precinct <span class="badge bg-info">9 AM - 5 PM</span></li>
-                        </ul>
+
+                        <!-- CRUD UI -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title">Manage Police Stations</h6>
+                                <form id="policeForm" class="row g-2 align-items-end">
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label">Station Name</label>
+                                        <input type="text" id="policeName" class="form-control" placeholder="Station name" required>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label">Hours / Details</label>
+                                        <input type="text" id="policeDetails" class="form-control" placeholder="Open 24/7 / Address">
+                                    </div>
+                                    <div class="col-12 col-md-2">
+                                        <input type="hidden" id="policeId">
+                                        <button type="submit" class="btn btn-success w-100">Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <ul class="list-group" id="policeList"></ul>
                         <div class="mt-3 text-center">
-                            <button class="btn btn-sm btn-outline-primary">Find Nearest Station</button>
+                            <button class="btn btn-sm btn-outline-primary" id="findNearestStation">Find Nearest Station</button>
                         </div>
                     </div>
                 </div>
@@ -87,6 +106,29 @@
             </div>
         </div>
     </div>
+    <script>
+        (function(){
+            const key = 'policeStations';
+            const listEl = document.getElementById('policeList');
+            const form = document.getElementById('policeForm');
+            const nameIn = document.getElementById('policeName');
+            const detailsIn = document.getElementById('policeDetails');
+            const idIn = document.getElementById('policeId');
+
+            function load(){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){return []} }
+            function save(items){ localStorage.setItem(key, JSON.stringify(items)); }
+
+            function render(){ const items = load(); listEl.innerHTML = ''; items.forEach(it => { const li = document.createElement('li'); li.className = 'list-group-item d-flex justify-content-between align-items-center'; li.innerHTML = `<div><strong>${escapeHtml(it.name)}</strong><div class="text-muted small">${escapeHtml(it.details||'')}</div></div>`; const actions = document.createElement('div'); actions.innerHTML = `<button class="btn btn-sm btn-outline-primary me-2" data-id="${it.id}" data-action="edit">Edit</button><button class="btn btn-sm btn-outline-danger" data-id="${it.id}" data-action="delete">Delete</button>`; li.appendChild(actions); listEl.appendChild(li); }); }
+
+            function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c]); }
+
+            form.addEventListener('submit', function(e){ e.preventDefault(); const name = nameIn.value.trim(); if(!name) return; const details = detailsIn.value.trim(); const items = load(); if(idIn.value){ const id = idIn.value; const idx = items.findIndex(x=>x.id===id); if(idx>=0){ items[idx].name = name; items[idx].details = details; } } else { items.push({ id: String(Date.now()), name, details }); } save(items); idIn.value=''; form.reset(); render(); });
+
+            listEl.addEventListener('click', function(e){ const btn = e.target.closest('button'); if(!btn) return; const id = btn.getAttribute('data-id'); const action = btn.getAttribute('data-action'); const items = load(); if(action==='delete'){ save(items.filter(x=>x.id!==id)); render(); return; } if(action==='edit'){ const it = items.find(x=>x.id===id); if(!it) return; idIn.value = it.id; nameIn.value = it.name; detailsIn.value = it.details||''; window.scrollTo({top: form.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); } });
+
+            render();
+        })();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
