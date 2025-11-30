@@ -285,6 +285,52 @@
     (function(){
         function escapeHtml(str){ if(str===null||str===undefined) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+        // Seed admin defaults (only when keys are absent)
+        (function seedAdminDefaults(){
+            try{
+                if(!localStorage.getItem('serviceUpdates')){
+                    const updates = [
+                        { id: String(Date.now()-4000), title: 'Planned Maintenance', content: 'Server maintenance tonight 11pm-1am', ts: Date.now()-86400000 },
+                        { id: String(Date.now()-3000), title: 'New Map Feature', content: 'Added map view to park listings', ts: Date.now()-172800000 }
+                    ];
+                    localStorage.setItem('serviceUpdates', JSON.stringify(updates));
+                }
+
+                if(!localStorage.getItem('cities')){
+                    const cities = [
+                        { id: String(Date.now()-6000), name: 'New Delhi', details: 'Capital city - key admin region' },
+                        { id: String(Date.now()-5000), name: 'Mumbai', details: 'Financial hub with busy transport network' }
+                    ];
+                    localStorage.setItem('cities', JSON.stringify(cities));
+                }
+
+                if(!localStorage.getItem('adminComplaints')){
+                    const adminComplaints = [
+                        { id: 'A1001', origId: 'r1', source: 'hospitalReports', text: 'Sample complaint: waiting time too long', user: {name:'Test User'}, ts: Date.now()-3600000, status: 'Pending' }
+                    ];
+                    localStorage.setItem('adminComplaints', JSON.stringify(adminComplaints));
+                }
+
+                // Seed some feedback examples
+                if(!localStorage.getItem('hospitalFeedbacks')){
+                    const f = [ { id: String(Date.now()-7000), text: 'Friendly staff and quick service', user: {name:'Priya'}, ts: Date.now()-90000000 } ];
+                    localStorage.setItem('hospitalFeedbacks', JSON.stringify(f));
+                }
+                if(!localStorage.getItem('parkFeedbacks')){
+                    const f = [ { id: String(Date.now()-7001), text: 'Beautiful trails and clean areas', user: {name:'Ravi'}, ts: Date.now()-80000000 } ];
+                    localStorage.setItem('parkFeedbacks', JSON.stringify(f));
+                }
+                if(!localStorage.getItem('policeFeedbacks')){
+                    const f = [ { id: String(Date.now()-7002), text: 'Helpful officers at the precinct', user: {name:'Anita'}, ts: Date.now()-70000000 } ];
+                    localStorage.setItem('policeFeedbacks', JSON.stringify(f));
+                }
+                if(!localStorage.getItem('transportFeedbacks')){
+                    const f = [ { id: String(Date.now()-7003), text: 'Buses are timely on Route 101', user: {name:'Kiran'}, ts: Date.now()-60000000 } ];
+                    localStorage.setItem('transportFeedbacks', JSON.stringify(f));
+                }
+            }catch(e){/* ignore storage errors */}
+        })();
+
         // ----- Service Updates -----
         (function(){
             const section = document.getElementById('service-updates');
