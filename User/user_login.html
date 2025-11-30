@@ -15,6 +15,18 @@
             <form id="userLoginForm">
                 <input type="email" class="form-control mb-3" placeholder="Email" id="userEmail">
                 <input type="password" class="form-control mb-3" placeholder="Password" id="userPassword">
+
+                <!-- Alphabet captcha -->
+                <div class="mb-3">
+                    <label class="form-label">Enter the letters shown</label>
+                    <div class="d-flex align-items-center mb-2">
+                        <div id="captcha" class="border rounded px-3 py-2 me-2" style="letter-spacing:4px; font-weight:700; user-select:none; background:#f8f9fa;"></div>
+                        <button type="button" id="refreshCaptcha" class="btn btn-outline-secondary btn-sm">↻</button>
+                    </div>
+                    <input type="text" id="captchaInput" class="form-control" placeholder="Type the letters" autocomplete="off">
+                    <div id="captchaError" class="text-danger mt-1" style="display:none; font-size:0.9rem;">Captcha does not match.</div>
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100">Login</button>
             </form>
            
@@ -27,39 +39,77 @@
     </div>
 
     <script>
-        // Accept any email/password for demo purposes and create a minimal user record.
-        document.getElementById('userLoginForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const userEmail = document.getElementById('userEmail').value.trim().toLowerCase();
-            const userPassword = document.getElementById('userPassword').value;
+        // Simple alphabet captcha (client-side) - generates A-Z letters only
+        (function(){
+            let currentCaptcha = '';
 
-            // Create a simple display name from the email local-part if possible
-            let name = 'User';
-            if(userEmail){
-                const parts = userEmail.split('@');
-                if(parts[0]){
-                    name = parts[0].replace(/[._\-]/g,' ').replace(/\b\w/g, c=>c.toUpperCase());
-                }
+            function generateCaptcha(len = 5){
+                const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                let s = '';
+                for(let i=0;i<len;i++) s += letters.charAt(Math.floor(Math.random()*letters.length));
+                currentCaptcha = s;
+                const el = document.getElementById('captcha');
+                if(el) el.textContent = s;
             }
 
-            const user = { name: name, email: userEmail, phone: '' };
+            // Wire up refresh button
+            const refreshBtn = document.getElementById('refreshCaptcha');
+            if(refreshBtn){
+                refreshBtn.addEventListener('click', function(){
+                    generateCaptcha();
+                    const inp = document.getElementById('captchaInput');
+                    if(inp) inp.value = '';
+                    const err = document.getElementById('captchaError');
+                    if(err) err.style.display = 'none';
+                });
+            }
 
-            try{
-                // Optionally store in users list for demo persistence
-                const users = JSON.parse(localStorage.getItem('users')||'[]');
-                // only add if not already present
-                if(userEmail && !users.find(u=>u.email===userEmail)){
-                    users.push(Object.assign({password: userPassword}, user));
-                    localStorage.setItem('users', JSON.stringify(users));
+            // initial captcha
+            generateCaptcha(5);
+
+            // Accept any email/password for demo purposes and create a minimal user record.
+            document.getElementById('userLoginForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                // Validate captcha first
+                const captchaVal = (document.getElementById('captchaInput')||{}).value || '';
+                const captchaErrorEl = document.getElementById('captchaError');
+                if(!captchaVal || captchaVal.trim().toUpperCase() !== currentCaptcha){
+                    if(captchaErrorEl) captchaErrorEl.style.display = 'block';
+                    return; // stop submission
                 }
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                localStorage.setItem('userProfile', JSON.stringify(user));
-                localStorage.setItem('userLoggedIn','true');
-            }catch(e){/* ignore storage errors */}
 
-            // Redirect to dashboard
-            window.location.href = 'user_dashboard.html';
-        });
+                const userEmail = document.getElementById('userEmail').value.trim().toLowerCase();
+                const userPassword = document.getElementById('userPassword').value;
+
+                // Create a simple display name from the email local-part if possible
+                let name = 'User';
+                if(userEmail){
+                    const parts = userEmail.split('@');
+                    if(parts[0]){
+                        name = parts[0].replace(/[._\-]/g,' ').replace(/\b\w/g, c=>c.toUpperCase());
+                    }
+                }
+
+                const user = { name: name, email: userEmail, phone: '' };
+
+                try{
+                    // Optionally store in users list for demo persistence
+                    const users = JSON.parse(localStorage.getItem('users')||'[]');
+                    // only add if not already present
+                    if(userEmail && !users.find(u=>u.email===userEmail)){
+                        users.push(Object.assign({password: userPassword}, user));
+                        localStorage.setItem('users', JSON.stringify(users));
+                    }
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    localStorage.setItem('userProfile', JSON.stringify(user));
+                    localStorage.setItem('userLoggedIn','true');
+                }catch(e){/* ignore storage errors */}
+
+                // Redirect to dashboard
+                window.location.href = 'user_dashboard.html';
+            });
+        })();
     </script>
 
 </body>
